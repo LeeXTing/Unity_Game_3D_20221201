@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 namespace selena
 {
@@ -25,6 +27,9 @@ namespace selena
         private GameObject goTriangle;
         #endregion
 
+        private PlayerInput playerInput; // 玩家輸入元件
+        private UnityEvent onDialogueFinish;
+
         #region 事件區域
         private void Awake()
         {
@@ -34,14 +39,23 @@ namespace selena
             goTriangle = GameObject.Find("對話完成圖示");
             goTriangle.SetActive(false);
 
+            playerInput = GameObject.Find("PlayerCapsule").GetComponent<PlayerInput>();
+
             StarDialogue(dialogueOpening);            
         }
         #endregion
 
-        public void StarDialogue(DialogueData data)
+        /// <summary>
+        /// 開始對話
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="_onDialogueFinish"></param>
+        public void StarDialogue(DialogueData data, UnityEvent _onDialogueFinish = null)
         {
+            playerInput.enabled = false; // 關閉 玩家輸入元件
             StartCoroutine(FadeGroup());
             StartCoroutine(TypeEffect(data));
+            onDialogueFinish = _onDialogueFinish;
         }
 
         /// <summary>
@@ -96,6 +110,11 @@ namespace selena
             }
 
             StartCoroutine(FadeGroup(false));
+
+            playerInput.enabled = true; // 開啟 玩家輸入元件
+
+            // ?. 當 onDialogueFinish 沒有值時就不執行
+            onDialogueFinish?.Invoke(); // 對話結束事件.呼叫();
         }
     }
 }

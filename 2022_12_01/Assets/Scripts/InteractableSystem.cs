@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace selena
 {
@@ -9,6 +10,13 @@ namespace selena
     {
         [SerializeField, Header("對話系統")]
         private DialogueData dataDialogue;
+        [SerializeField, Header("對話結束後的事件")]
+        private UnityEvent onDialogueFinish; // Unity 事件
+
+        [SerializeField, Header("啟動道具")]
+        private GameObject propActive;
+        [SerializeField, Header("啟動後的對話資料")]
+        private DialogueData dataDialogueActive;
 
         private string nameTarget = "PlayerCapsule";
         private DialogueSystem dialogueSystem;
@@ -27,6 +35,16 @@ namespace selena
             if (other.name.Contains(nameTarget))
             {
                 print(other.name);
+
+                // 如果 不需要啟動道具 或者 啟動道具是顯示的 就執行 第一段對話
+                if (propActive == null || propActive.activeInHierarchy)
+                {
+                    dialogueSystem.StarDialogue(dataDialogue, onDialogueFinish);
+                }
+                else
+                {
+                    dialogueSystem.StarDialogue(dataDialogueActive);
+                }
             }
             
         }
@@ -41,6 +59,14 @@ namespace selena
         private void OnTriggerStay(Collider other)
         {
             
+        }
+
+        /// <summary>
+        /// 隱藏物件
+        /// </summary>
+        public void HiddenObject()
+        {
+            gameObject.SetActive(false);
         }
     }
 }
